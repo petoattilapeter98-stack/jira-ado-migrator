@@ -64,6 +64,12 @@ namespace WorkItemImport.WitClient
                 url = $"vstfs:///Git/Commit/{projectId}%2F{repositoryId}%2F{developmentLinkId}";
                 nameAttribute = "Fixed in Commit";
             }
+            else if (type == "Branch")
+            {
+                // ADO Git branch refs use the "GB" (Git Branch) prefix on the ref name.
+                url = $"vstfs:///Git/Ref/{projectId}%2F{repositoryId}%2FGB{developmentLinkId}";
+                nameAttribute = "Branch";
+            }
             else
             {
                 throw new ArgumentException(nameof(type));
@@ -81,6 +87,27 @@ namespace WorkItemImport.WitClient
                     {
                         Name = nameAttribute
                     }
+                }
+            };
+        }
+
+        // US5: a Jira remote/web link becomes an Azure DevOps "Hyperlink" relation on the work item.
+        public static JsonPatchOperation CreateHyperlinkPatchOp(Operation op, string url, string title)
+        {
+            if (string.IsNullOrEmpty(url))
+            {
+                throw new ArgumentException(nameof(url));
+            }
+
+            return new JsonPatchOperation()
+            {
+                Operation = op,
+                Path = "/relations/-",
+                Value = new PatchOperationValue
+                {
+                    Rel = "Hyperlink",
+                    Url = url,
+                    Attributes = string.IsNullOrEmpty(title) ? null : new Attributes { Name = title }
                 }
             };
         }

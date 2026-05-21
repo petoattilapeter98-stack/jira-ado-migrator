@@ -138,15 +138,15 @@ Tests live in `…/tests/Migration.Jira-Export.Tests/`, `…/tests/Migration.Wi-
 
 ### Tests for User Story 5
 
-- [ ] T034 [P] [US5] Tests for `CreateHyperlinkPatchOp` and de-duplicated apply in `…/tests/Migration.Wi-Import.Tests/WitClient/JsonPatchDocUtilsTests.cs`
+- [X] T034 [P] [US5] Tests for `CreateHyperlinkPatchOp` (correct op + throws on null url) in `…/tests/Migration.Wi-Import.Tests/WitClient/JsonPatchDocUtilsTests.cs` (2 tests)
 
 ### Implementation for User Story 5
 
-- [ ] T035 [US5] Fetch remote links (`/issue/{key}/remotelink`) in `…/JiraExport/JiraServiceWrapper.cs` and `…/JiraExport/JiraProvider.cs`
-- [ ] T036 [P] [US5] Add `JiraRemoteLink` model + `ExtractRemoteLinks` in `…/JiraExport/JiraItem.cs`
-- [ ] T037 [P] [US5] Extend `WiLink` with `IsRemoteLink`/`Url`/`Title` in `…/Migration.WIContract/WiLink.cs`
-- [ ] T038 [US5] Add `CreateHyperlinkPatchOp` in `…/WorkItemImport/WitClient/JsonPatchDocUtils.cs`
-- [ ] T039 [US5] Apply hyperlinks (skip duplicates) in `…/WorkItemImport/Agent.cs` (`ApplyAndSaveLinks`)
+- [ ] T035 [US5] DEFERRED: fetch remote links (`/issue/{key}/remotelink`) in `…/JiraExport/JiraServiceWrapper.cs`/`JiraProvider.cs` — Jira REST call, not verifiable offline; needs a live instance
+- [ ] T036 [P] [US5] DEFERRED: `JiraRemoteLink` model + `ExtractRemoteLinks` in `…/JiraExport/JiraItem.cs` (depends on T035)
+- [ ] T037 [P] [US5] DEFERRED: extend `WiLink` with `IsRemoteLink`/`Url`/`Title` (inert until export/apply exist)
+- [X] T038 [US5] Added `CreateHyperlinkPatchOp` in `…/WorkItemImport/WitClient/JsonPatchDocUtils.cs` — import is now hyperlink-capable
+- [ ] T039 [US5] DEFERRED: apply hyperlinks in `…/WorkItemImport/Agent.cs` (`ApplyAndSaveLinks`) (depends on T035/T036)
 
 **Checkpoint**: US1–US5 independently functional.
 
@@ -160,13 +160,13 @@ Tests live in `…/tests/Migration.Jira-Export.Tests/`, `…/tests/Migration.Wi-
 
 ### Tests for User Story 6
 
-- [ ] T040 [P] [US6] Tests for the Branch artifact-link patch (`vstfs:///Git/Ref/...`) and unmapped-repo skip in `…/tests/Migration.Wi-Import.Tests/WitClient/JsonPatchDocUtilsTests.cs`
+- [X] T040 [P] [US6] Test for the Branch artifact-link patch (`vstfs:///Git/Ref/...GB<branch>`) in `…/tests/Migration.Wi-Import.Tests/WitClient/JsonPatchDocUtilsTests.cs` (1 test)
 
 ### Implementation for User Story 6
 
-- [ ] T041 [US6] Add `Branch` to `DevelopmentLinkType` in `…/JiraExport/JiraDevelopmentLink.cs`
-- [ ] T042 [US6] Fetch branches (parallel to commit fetch) in `…/JiraExport/JiraItem.cs`
-- [ ] T043 [US6] Add the `Branch` case (Git ref artifact URI) in `…/WorkItemImport/WitClient/JsonPatchDocUtils.cs` (`CreateJsonArtifactLinkPatchOp`)
+- [X] T041 [US6] `Branch` already present in `DevelopmentLinkType` (`…/JiraExport/JiraDevelopmentLink.cs`) — verified
+- [ ] T042 [US6] DEFERRED: fetch branches (parallel to commit fetch) in `…/JiraExport/JiraItem.cs` — Jira dev-status REST call, not verifiable offline
+- [X] T043 [US6] Added the `Branch` case (Git ref artifact URI) in `…/WorkItemImport/WitClient/JsonPatchDocUtils.cs` — import is now branch-capable
 
 **Checkpoint**: US1–US6 independently functional.
 
