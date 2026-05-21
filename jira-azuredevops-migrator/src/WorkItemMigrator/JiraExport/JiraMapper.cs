@@ -84,7 +84,18 @@ namespace JiraExport
 
                     Func<JiraRevision, (bool, object)> value;
 
-                    if (item.Mapping?.Values != null)
+                    if (!string.IsNullOrWhiteSpace(item.PropertyPath))
+                    {
+                        // US8: select a property of an object/array field from the raw Jira issue JSON.
+                        value = r =>
+                        {
+                            var sourceKey = isCustomField ? (_jiraProvider.GetCustomId(item.Source) ?? item.Source) : item.Source;
+                            var token = r.ParentItem?.RemoteIssue?.SelectToken($"$.fields.{sourceKey}");
+                            var selected = FieldMapperUtils.ExtractPropertyValue(token, item.PropertyPath);
+                            return (selected != null, selected);
+                        };
+                    }
+                    else if (item.Mapping?.Values != null)
                     {
                         value = r => FieldMapperUtils.MapValue(r, item.Source, item.Target, _config, exportIssuesSummary);
                     }

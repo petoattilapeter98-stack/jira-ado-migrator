@@ -199,12 +199,12 @@ Tests live in `…/tests/Migration.Jira-Export.Tests/`, `…/tests/Migration.Wi-
 
 ### Tests for User Story 8
 
-- [ ] T047 [P] [US8] Tests for `ExtractPropertyValue` / `SelectToken` (matched + unmatched→empty) in `…/tests/Migration.Jira-Export.Tests/RevisionUtils/FieldMapperUtilsTests.cs`
+- [X] T047 [P] [US8] Tests for `ExtractPropertyValue` (object/array select, primitive type preserved, unmatched→null, null token, malformed path) in `…/tests/Migration.Jira-Export.Tests/RevisionUtils/PropertyPathTests.cs` (6 tests)
 
 ### Implementation for User Story 8
 
-- [ ] T048 [US8] Implement `ExtractPropertyValue` using `JToken.SelectToken` in `…/JiraExport/RevisionUtils/FieldMapperUtils.cs`
-- [ ] T049 [US8] Wire `property-path` into extraction/`IfChanged` in `…/JiraExport/JiraMapper.cs` (and `JiraItem.ExtractFields` if needed)
+- [X] T048 [US8] Implemented `ExtractPropertyValue` using `JToken.SelectToken` in `…/JiraExport/RevisionUtils/FieldMapperUtils.cs`
+- [X] T049 [US8] Wired `property-path` as a top-precedence branch in `…/JiraExport/JiraMapper.cs` that reads the raw field token from `JiraItem.RemoteIssue` (no `ExtractFields` change needed)
 
 **Checkpoint**: All 8 user stories independently functional.
 

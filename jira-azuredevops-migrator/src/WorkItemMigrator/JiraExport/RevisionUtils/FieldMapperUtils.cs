@@ -233,6 +233,40 @@ namespace JiraExport
             return (true, string.Join(separator, nonEmpty));
         }
 
+        // US8: select a named property of an object/array-typed Jira field via JSONPath
+        // (e.g. "$.lead.displayName" or "$[0].name"). An unmatched or malformed path yields
+        // null, which the caller treats as an empty field (no error).
+        public static object ExtractPropertyValue(JToken fieldToken, string propertyPath)
+        {
+            if (fieldToken == null || string.IsNullOrWhiteSpace(propertyPath))
+                return null;
+
+            JToken selected;
+            try
+            {
+                selected = fieldToken.SelectToken(propertyPath);
+            }
+            catch (Newtonsoft.Json.JsonException)
+            {
+                return null; // malformed path => treat as no match
+            }
+
+            if (selected == null || selected.Type == JTokenType.Null)
+                return null;
+
+            switch (selected.Type)
+            {
+                case JTokenType.String:
+                case JTokenType.Integer:
+                case JTokenType.Float:
+                case JTokenType.Boolean:
+                case JTokenType.Date:
+                    return selected.ToObject<object>();
+                default:
+                    return selected.ToString();
+            }
+        }
+
         public static object MapSprint(string iterationPathsString)
         {
             if (string.IsNullOrWhiteSpace(iterationPathsString))
