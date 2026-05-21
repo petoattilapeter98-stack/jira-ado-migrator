@@ -498,15 +498,14 @@ namespace WorkItemImport
                 {
                     var classificationNode = new WorkItemClassificationNode() { Name = nameMapped };
 
-                    // Set sprint start/end dates on iteration nodes so ADO knows which sprints are past/current/future
+                    // Set sprint start/end dates on iteration nodes so ADO knows which sprints are past/current/future.
+                    // Undated sprints yield no attributes (a dateless iteration) rather than failing the import.
                     if (structureGroup == TreeStructureGroup.Iterations && Settings.SprintDates != null
                         && Settings.SprintDates.TryGetValue(nameMapped, out var sprintInfo))
                     {
-                        classificationNode.Attributes = new System.Collections.Generic.Dictionary<string, object>();
-                        if (sprintInfo.StartDate.HasValue)
-                            classificationNode.Attributes["startDate"] = sprintInfo.StartDate.Value;
-                        if (sprintInfo.EndDate.HasValue)
-                            classificationNode.Attributes["finishDate"] = sprintInfo.EndDate.Value;
+                        var dateAttributes = IterationDates.Build(sprintInfo);
+                        if (dateAttributes != null)
+                            classificationNode.Attributes = dateAttributes;
                     }
 
                     node = WiClient.CreateOrUpdateClassificationNodeAsync(classificationNode, Settings.Project, structureGroup, parent).Result;

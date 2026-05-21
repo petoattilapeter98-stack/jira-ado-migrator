@@ -75,13 +75,13 @@ Tests live in `…/tests/Migration.Jira-Export.Tests/`, `…/tests/Migration.Wi-
 
 ### Tests for User Story 2
 
-- [ ] T019 [P] [US2] Tests asserting iteration node start/finish dates set from metadata, and undated/malformed sprint dates don't abort, in `…/tests/Migration.Wi-Import.Tests/AgentTests.cs`
+- [X] T019 [P] [US2] Tests for iteration-date attributes (both/start-only/undated/null) in `…/tests/Migration.Wi-Import.Tests/IterationDatesTests.cs` (4 tests)
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Verify/enable the sprint date+state cache in `…/JiraExport/JiraItem.cs` (≈ lines 530–547); gate behind config if needed
-- [ ] T021 [US2] Harden iteration-node date setting in `…/WorkItemImport/Agent.cs` (`EnsureClasification`, ≈ lines 501–510): handle undated/malformed dates gracefully (Edge Cases)
-- [ ] T022 [US2] Confirm `sprint-metadata.json` load path into `Settings.SprintDates` in `…/WorkItemImport/ImportCommandLine.cs`
+- [X] T020 [US2] Verified the sprint date+state cache in `…/JiraExport/JiraItem.cs` is already populated unconditionally during export; no config gate needed (sidecar only written when non-empty)
+- [X] T021 [US2] Hardened iteration-node date setting in `…/WorkItemImport/Agent.cs` — extracted to `IterationDates.Build` (returns null for undated → dateless iteration, no failure); malformed dates still caught by the existing try/catch
+- [X] T022 [US2] Confirmed `sprint-metadata.json` loads into `Settings.SprintDates` in `…/WorkItemImport/ImportCommandLine.cs`
 
 **Checkpoint**: US1 + US2 both work independently.
 
