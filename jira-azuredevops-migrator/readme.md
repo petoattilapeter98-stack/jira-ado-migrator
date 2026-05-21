@@ -123,6 +123,14 @@ Our tool supports the following Jira test frameworks:
 
 The **Confluence to Azure DevOps Wikis Migrator** enables you to transfer you existing **Confluence** spaces to Azure DevOps Wikis, preserving all of your wiki content and formatting in confluence
 
+## Community parity additions
+
+This build extends the Community Edition toward PRO feature parity (all opt-in; no change to existing
+behavior when the new keys are absent). See [docs/pro-feature-parity.md](docs/pro-feature-parity.md):
+Releases & Fix/Affects Version (as tags + a release report), sprint dates on iterations, custom-state
+transition dates, embedded Jira-link correction, a composite field mapper, and object/array property
+selection. Remote/web links and branch dev-links are import-capable (the Jira-side fetch is still pending).
+
 ## FAQ - Frequently Asked Questions
 
 - See [FAQ - Frequently Asked Questions](docs/faq.md)
