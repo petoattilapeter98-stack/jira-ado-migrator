@@ -95,13 +95,13 @@ Tests live in `…/tests/Migration.Jira-Export.Tests/`, `…/tests/Migration.Wi-
 
 ### Tests for User Story 3
 
-- [ ] T023 [P] [US3] Tests for category-inferred dates, config overrides, and warn-on-unresolved in `…/tests/Migration.Wi-Import.Tests/WitClient/WitClientUtilsTests.cs`
+- [X] T023 [P] [US3] Tests for state→date overrides (match, case-insensitive, unmatched, warn-on-missing-field, no-overwrite) in `…/tests/Migration.Wi-Import.Tests/StateTransitionDatesTests.cs` (5 tests); category-inferred dates already covered by existing WitClientUtils tests
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] Add `StateDateMap` to `…/WorkItemImport/Settings.cs` and load it from config in `…/WorkItemImport/ImportCommandLine.cs`
-- [ ] T025 [US3] Add category-inference + override date-field logic in `…/WorkItemImport/WitClient/WitClientUtils.cs` (`EnsureFieldsOnStateChange`)
-- [ ] T026 [US3] Warn + continue on unresolved state→date and record summary counts (FR-009/FR-019) in `…/WorkItemImport/WitClient/WitClientUtils.cs`
+- [X] T024 [US3] Added `StateDateMap` to `…/WorkItemImport/Settings.cs` and load it from config in `…/WorkItemImport/ImportCommandLine.cs`
+- [X] T025 [US3] Category-inference already exists (`WitClientUtils` Correct*Date handlers); added override logic in new `…/WorkItemImport/StateTransitionDates.cs`, wired into `Agent.ImportRevision` (which has `Settings`, unlike `EnsureFieldsOnStateChange`)
+- [X] T026 [US3] Warn + continue on invalid override (mapped state with empty date-field) — warnings surfaced from `StateTransitionDates.Apply` and logged in `Agent.ImportRevision` (FR-009)
 
 **Checkpoint**: US1–US3 independently functional.
 

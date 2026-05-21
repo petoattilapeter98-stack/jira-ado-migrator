@@ -72,6 +72,14 @@ namespace WorkItemImport
                 _witClientUtils.EnsureAssigneeField(rev, wi);
                 _witClientUtils.EnsureFieldsOnStateChange(rev, wi);
 
+                // US3: apply configured custom-state -> date-field overrides (standard dates handled above)
+                if (settings?.StateDateMap != null && settings.StateDateMap.Count > 0)
+                {
+                    StateTransitionDates.Apply(rev, settings.StateDateMap, out var stateDateWarnings);
+                    foreach (var warning in stateDateWarnings)
+                        Logger.Log(LogLevel.Warning, warning);
+                }
+
                 _witClientUtils.EnsureWorkItemFieldsInitialized(rev, wi);
 
                 var attachmentMap = new Dictionary<string, WiAttachment>();

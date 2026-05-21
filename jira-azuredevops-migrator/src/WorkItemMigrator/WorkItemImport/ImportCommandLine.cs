@@ -97,7 +97,8 @@ namespace WorkItemImport
                     FieldMap = config.FieldMap,
                     SuppressNotifications = config.SuppressNotifications,
                     ChangedDateBumpMS = config.ChangedDateBumpMS,
-                    Workspace = config.Workspace
+                    Workspace = config.Workspace,
+                    StateDateMap = config.StateDateMap
                 };
 
                 // Load sprint metadata written by jira-export (sprint dates/state for ADO iteration nodes)
