@@ -1,0 +1,17 @@
+# Claude Code local config, skills, and hook logs — not part of the project
+.claude/
+logs/
+
+# .NET build output
+**/bin/
+**/obj/
+*.user
+.vs/
+
+# Node (Spec Kit e2e extension)
+**/node_modules/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp

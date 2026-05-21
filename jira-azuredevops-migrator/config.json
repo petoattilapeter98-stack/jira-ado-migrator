@@ -1,0 +1,111 @@
+{
+  "source-project": "Alpha",
+  "target-project": "TestMigrationProject2",
+  "query": "project = Alpha ORDER BY created ASC",
+  "using-jira-cloud": true,
+  "jira-api-version": 3,
+  "workspace": "/tmp/jira-export/",
+  "epic-link-field": "Epic Link",
+  "sprint-field": "Sprint",
+  "download-options": 7,
+  "batch-size": 20,
+  "log-level": "Info",
+  "attachment-folder": "Attachments",
+  "user-mapping-file": null,
+  "base-area-path": "",
+  "base-iteration-path": "",
+  "ignore-failed-links": true,
+  "include-link-comments": false,
+  "suppress-notifications": false,
+  "sleep-time-between-revision-import-milliseconds": 0,
+  "process-template": "Agile",
+  "link-map": {
+    "link": [
+      { "source": "Epic", "target": "System.LinkTypes.Hierarchy-Reverse" },
+      { "source": "Parent", "target": "System.LinkTypes.Hierarchy-Reverse" },
+      { "source": "Child", "target": "System.LinkTypes.Hierarchy-Forward" },
+      { "source": "Relates", "target": "System.LinkTypes.Related" },
+      { "source": "Duplicate", "target": "System.LinkTypes.Duplicate-Forward" }
+    ]
+  },
+  "type-map": {
+    "type": [
+      { "source": "Epic", "target": "Epic" },
+      { "source": "Story", "target": "User Story" },
+      { "source": "Bug", "target": "Bug" },
+      { "source": "Task", "target": "Task" },
+      { "source": "Sub-task", "target": "Task" },
+      { "source": "Subtask", "target": "Task" }
+    ]
+  },
+  "field-map": {
+    "field": [
+      { "source": "summary", "target": "System.Title", "mapper": "MapTitle" },
+      { "source": "assignee", "target": "System.AssignedTo", "mapper": "MapUser" },
+      { "source": "description", "target": "System.Description", "mapper": "MapRendered" },
+      { "source": "comment", "target": "System.History", "mapper": "MapRendered" },
+      { "source": "labels", "target": "System.Tags", "mapper": "MapTags" },
+      {
+        "source": "Story point estimate",
+        "source-type": "name",
+        "target": "Microsoft.VSTS.Scheduling.StoryPoints",
+        "type": "double"
+      },
+      {
+        "source": "Sprint",
+        "source-type": "name",
+        "target": "System.IterationPath",
+        "mapper": "MapSprint"
+      },
+      {
+        "source": "priority",
+        "target": "Microsoft.VSTS.Common.Priority",
+        "mapping": {
+          "values": [
+            { "source": "Highest", "target": "1" },
+            { "source": "High", "target": "2" },
+            { "source": "Medium", "target": "3" },
+            { "source": "Low", "target": "4" },
+            { "source": "Lowest", "target": "4" }
+          ]
+        }
+      },
+      {
+        "source": "status",
+        "target": "System.State",
+        "for": "User Story,Epic",
+        "mapping": {
+          "values": [
+            { "source": "To Do", "target": "New" },
+            { "source": "In Progress", "target": "Active" },
+            { "source": "Done", "target": "Closed" }
+          ]
+        }
+      },
+      {
+        "source": "status",
+        "target": "System.State",
+        "for": "Task",
+        "mapping": {
+          "values": [
+            { "source": "To Do", "target": "New" },
+            { "source": "In Progress", "target": "Active" },
+            { "source": "Done", "target": "Closed" }
+          ]
+        }
+      },
+      {
+        "source": "status",
+        "target": "System.State",
+        "for": "Bug",
+        "mapping": {
+          "values": [
+            { "source": "To Do", "target": "New" },
+            { "source": "In Progress", "target": "Active" },
+            { "source": "Done", "target": "Resolved" }
+          ]
+        }
+      }
+    ]
+  }
+}
