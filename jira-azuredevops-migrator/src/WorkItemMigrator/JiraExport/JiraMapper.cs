@@ -125,6 +125,9 @@ namespace JiraExport
                             case "MapAffectsVersions":
                                 value = IfChanged<string>(item.Source, isCustomField, FieldMapperUtils.MapAffectsVersions);
                                 break;
+                            case "MapComposite":
+                                value = r => FieldMapperUtils.MapComposite(r, item);
+                                break;
                             default:
                                 value = IfChanged<string>(item.Source, isCustomField);
                                 break;

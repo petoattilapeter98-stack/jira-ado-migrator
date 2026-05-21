@@ -196,6 +196,43 @@ namespace JiraExport
             return string.Join(";", tags);
         }
 
+        // US7: consolidate multiple Jira source fields into one target value. Joins the source
+        // values in order with Field.CompositeSeparator (skipping empties, so no stray separators),
+        // or formats them via Field.CompositeTemplate when one is provided.
+        public static (bool, object) MapComposite(JiraRevision r, Field field)
+        {
+            if (r == null)
+                throw new ArgumentNullException(nameof(r));
+
+            if (field?.CompositeSources == null || field.CompositeSources.Count == 0)
+                return (false, null);
+
+            var values = new List<string>();
+            bool anyFound = false;
+
+            foreach (var source in field.CompositeSources)
+            {
+                string val = string.Empty;
+                if (!string.IsNullOrEmpty(source?.Source)
+                    && r.Fields.TryGetValue(source.Source.ToLower(), out var raw) && raw != null)
+                {
+                    val = raw.ToString();
+                    anyFound = true;
+                }
+                values.Add(val);
+            }
+
+            if (!anyFound)
+                return (false, null);
+
+            if (!string.IsNullOrEmpty(field.CompositeTemplate))
+                return (true, string.Format(field.CompositeTemplate, values.ToArray()));
+
+            var separator = field.CompositeSeparator ?? " ";
+            var nonEmpty = values.Where(v => !string.IsNullOrWhiteSpace(v));
+            return (true, string.Join(separator, nonEmpty));
+        }
+
         public static object MapSprint(string iterationPathsString)
         {
             if (string.IsNullOrWhiteSpace(iterationPathsString))

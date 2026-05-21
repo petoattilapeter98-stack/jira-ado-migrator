@@ -180,12 +180,12 @@ Tests live in `…/tests/Migration.Jira-Export.Tests/`, `…/tests/Migration.Wi-
 
 ### Tests for User Story 7
 
-- [ ] T044 [P] [US7] Tests for `MapComposite` (ordered join, skip empties, optional template) in `…/tests/Migration.Jira-Export.Tests/RevisionUtils/FieldMapperUtilsTests.cs`
+- [X] T044 [P] [US7] Tests for `MapComposite` (ordered join, skip empties, optional template, no-sources cases) in `…/tests/Migration.Jira-Export.Tests/RevisionUtils/CompositeMapperTests.cs` (5 tests)
 
 ### Implementation for User Story 7
 
-- [ ] T045 [US7] Implement `MapComposite` in `…/JiraExport/RevisionUtils/FieldMapperUtils.cs`
-- [ ] T046 [US7] Dispatch `MapComposite` in `…/JiraExport/JiraMapper.cs`
+- [X] T045 [US7] Implemented `MapComposite` in `…/JiraExport/RevisionUtils/FieldMapperUtils.cs` (separator join skipping empties, or `composite-template` format)
+- [X] T046 [US7] Dispatched `MapComposite` in `…/JiraExport/JiraMapper.cs`
 
 **Checkpoint**: US1–US7 independently functional. (Config support from T005/T006.)
 
