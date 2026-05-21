@@ -128,6 +128,18 @@ namespace WorkItemImport
                     }
                 }
 
+                // Load the pre-run inventory index (FR-020) used for embedded-link validation (US4)
+                var inventoryPath = Path.Combine(config.Workspace, "inventory-index.json");
+                if (File.Exists(inventoryPath))
+                {
+                    var inventory = JsonConvert.DeserializeObject<InventoryIndex>(File.ReadAllText(inventoryPath));
+                    if (inventory != null)
+                    {
+                        settings.Inventory = inventory;
+                        Logger.Log(LogLevel.Info, $"Loaded inventory index ({inventory.IssueKeys.Count} issue(s)) from '{inventoryPath}'.");
+                    }
+                }
+
                 // initialize Azure DevOps/TFS connection. Creates/fetches project, fills area and iteration caches.
                 var agent = Agent.Initialize(context, settings);
 

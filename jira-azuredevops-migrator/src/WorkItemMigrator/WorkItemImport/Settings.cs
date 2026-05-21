@@ -1,4 +1,5 @@
-﻿using Migration.Common.Config;
+﻿using Migration.Common;
+using Migration.Common.Config;
 using System.Collections.Generic;
 
 namespace WorkItemImport
@@ -28,6 +29,7 @@ namespace WorkItemImport
         public Dictionary<string, SprintDateInfo> SprintDates { get; internal set; } = new Dictionary<string, SprintDateInfo>();
         public Dictionary<string, ReleaseInfo> ReleaseDates { get; internal set; } = new Dictionary<string, ReleaseInfo>();
         public List<StateDate> StateDateMap { get; internal set; } = new List<StateDate>();
+        public InventoryIndex Inventory { get; internal set; }
     }
 
     public class SprintDateInfo

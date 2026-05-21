@@ -1,5 +1,6 @@
 ﻿using Common.Config;
 using Microsoft.Extensions.CommandLineUtils;
+using Migration.Common;
 using Migration.Common.Config;
 using Migration.Common.Log;
 using Migration.WIContract;
@@ -162,6 +163,17 @@ namespace JiraExport
                     var releaseMetaPath = Path.Combine(migrationWorkspace, "release-metadata.json");
                     File.WriteAllText(releaseMetaPath, JsonConvert.SerializeObject(releaseMeta, Formatting.Indented));
                     Logger.Log(LogLevel.Info, $"Wrote release metadata for {releaseMeta.Count} release(s) to '{releaseMetaPath}'.");
+                }
+
+                // Build the pre-run inventory/index (FR-020) used for embedded-link validation on import
+                if (config.BuildInventory || config.CorrectEmbeddedLinks)
+                {
+                    var inventory = new InventoryIndex();
+                    foreach (var createdWi in createdWorkItems)
+                        inventory.AddIssue(createdWi.OriginId);
+                    var inventoryPath = Path.Combine(migrationWorkspace, "inventory-index.json");
+                    File.WriteAllText(inventoryPath, JsonConvert.SerializeObject(inventory, Formatting.Indented));
+                    Logger.Log(LogLevel.Info, $"Wrote inventory index ({inventory.IssueKeys.Count} issue(s)) to '{inventoryPath}'.");
                 }
             }
             catch (CommandParsingException e)

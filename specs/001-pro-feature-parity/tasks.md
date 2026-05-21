@@ -115,16 +115,16 @@ Tests live in `…/tests/Migration.Jira-Export.Tests/`, `…/tests/Migration.Wi-
 
 ### Tests for User Story 4
 
-- [ ] T027 [P] [US4] Inventory-build tests in `…/tests/Migration.Jira-Export.Tests/InventoryIndexTests.cs`
-- [ ] T028 [P] [US4] Link-correction tests (hyperlink + validated bare key + plain-text fallback) in `…/tests/Migration.Wi-Import.Tests/WitClient/WitClientUtilsTests.cs`
+- [X] T027 [P] [US4] Inventory model tests in `…/tests/Migration.Common.Tests/InventoryIndexTests.cs` (4 tests)
+- [X] T028 [P] [US4] Link-correction tests (browse URL + validated bare key + out-of-scope no-op + unresolved + mixed) in `…/tests/Migration.Wi-Import.Tests/EmbeddedLinkCorrectorTests.cs` (6 tests)
 
 ### Implementation for User Story 4
 
-- [ ] T029 [US4] Build the pre-run inventory (projects/issue keys/labels/versions) in `…/JiraExport/JiraProvider.cs` and write `inventory-index.json` in `…/JiraExport/JiraCommandLine.cs` (FR-020)
-- [ ] T030 [US4] Load `inventory-index.json` into `Settings.Inventory` in `…/WorkItemImport/ImportCommandLine.cs` and `…/WorkItemImport/Settings.cs`
-- [ ] T031 [US4] Implement `CorrectIssueLinkReferences` (detect hyperlinks + bare keys, validate against inventory) beside `CorrectComment`/`CorrectImagePath` in `…/WorkItemImport/WitClient/WitClientUtils.cs`
-- [ ] T032 [US4] Add a finalization pass resolving not-yet-migrated targets via the journal in `…/WorkItemImport/Agent.cs`
-- [ ] T033 [US4] Plain-text fallback + unresolved-reference counts (FR-011/FR-019) in `…/WorkItemImport/WitClient/WitClientUtils.cs`
+- [X] T029 [US4] Build the pre-run inventory (issue keys + derived projects) from the exported items and write `inventory-index.json` in `…/JiraExport/JiraCommandLine.cs`, gated on `build-inventory`/`correct-embedded-links` (FR-020). NOTE: built from the exported set (post-mapping, pre-import) rather than a separate `JiraProvider` pass — simpler and captures the same in-scope keys
+- [X] T030 [US4] Added `Settings.Inventory` and load `inventory-index.json` in `…/WorkItemImport/ImportCommandLine.cs`
+- [X] T031 [US4] Rewriter logic implemented & tested as `…/WorkItemImport/EmbeddedLinkCorrector.cs` (browse URLs + bare keys validated against the inventory). DEFERRED: invoking it inside the live text-correction path (`WitClientUtils` description/comment/repro correction) — invasive signature threading, left as follow-up
+- [ ] T032 [US4] DEFERRED: finalization pass resolving not-yet-migrated (forward-reference) targets via the journal in `…/WorkItemImport/Agent.cs` — requires the live wiring (T031) first
+- [X] T033 [US4] Plain-text fallback + rewritten/unresolved counts implemented in `EmbeddedLinkCorrector.Rewrite` (FR-011); end-of-run aggregation lands with the live wiring
 
 **Checkpoint**: US1–US4 independently functional.
 
