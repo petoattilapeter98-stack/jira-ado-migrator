@@ -761,7 +761,7 @@ namespace WorkItemImport
                         string imageSrcPattern1 = $"src.*?=.*?\"([^\"])(?=.*{att.AttOriginId}).*?\"";
                         textField = Regex.Replace(textField, imageSrcPattern1, $"src=\"{tfsAtt.Url}\"");
 
-                        string imageSrcPattern2 = $"!{att.FileName}!";
+                        string imageSrcPattern2 = $"!{Regex.Escape(att.FileName)}!";
                         textField = Regex.Replace(textField, imageSrcPattern2, $"<img src=\"{tfsAtt.Url}\"/>");
 
                         isUpdated = true;

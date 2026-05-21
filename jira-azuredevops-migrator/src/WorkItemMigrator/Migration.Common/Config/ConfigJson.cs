@@ -1,4 +1,5 @@
 ﻿using Migration.Common.Config;
+using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
@@ -92,6 +93,26 @@ namespace Common.Config
 
         [JsonProperty(PropertyName = "jira-api-version")]
         public int JiraApiVersion { get; set; } = 3;
+
+        // --- PRO feature-parity toggles (all opt-in; defaults preserve current behavior) ---
+
+        [JsonProperty(PropertyName = "build-inventory")]
+        public bool BuildInventory { get; set; } = false;
+
+        [JsonProperty(PropertyName = "version-target")]
+        public string VersionTarget { get; set; } = "tags";   // "tags" | "field"
+
+        [JsonProperty(PropertyName = "include-remote-links")]
+        public bool IncludeRemoteLinks { get; set; } = false;
+
+        [JsonProperty(PropertyName = "include-branch-links")]
+        public bool IncludeBranchLinks { get; set; } = false;
+
+        [JsonProperty(PropertyName = "correct-embedded-links")]
+        public bool CorrectEmbeddedLinks { get; set; } = false;
+
+        [JsonProperty(PropertyName = "state-date-map")]
+        public List<StateDate> StateDateMap { get; set; } = new List<StateDate>();
 
     }
 }

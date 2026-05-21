@@ -1,0 +1,40 @@
+{
+  "source-project": "DEMO",
+  "target-project": "Demo",
+  "query": "project = DEMO ORDER BY Rank ASC",
+  "workspace": "/tmp/jira-export/",
+  "attachment-folder": "Attachments",
+  "user-mapping-file": null,
+  "process-template": "Scrum",
+
+  "build-inventory": true,
+  "version-target": "tags",
+  "include-remote-links": true,
+  "include-branch-links": true,
+  "correct-embedded-links": true,
+  "state-date-map": [
+    { "state": "Active", "date-field": "Microsoft.VSTS.Common.ActivatedDate" },
+    { "state": "Resolved", "date-field": "Microsoft.VSTS.Common.ResolvedDate" }
+  ],
+
+  "type-map": { "type": [ { "source": "Story", "target": "User Story" } ] },
+  "link-map": { "link": [ { "source": "Relates", "target": "System.LinkTypes.Related" } ] },
+  "field-map": {
+    "field": [
+      { "source": "summary", "target": "System.Title", "mapper": "MapTitle" },
+      { "source": "fixVersions", "target": "System.Tags", "mapper": "MapFixVersions" },
+      { "source": "versions", "target": "System.Tags", "mapper": "MapAffectsVersions" },
+      {
+        "target": "Custom.OriginContext",
+        "source": "composite",
+        "mapper": "MapComposite",
+        "composite-separator": " / ",
+        "composite-sources": [
+          { "source": "components", "source-type": "name" },
+          { "source": "environment", "source-type": "name" }
+        ]
+      },
+      { "source": "customfield_10100", "target": "Custom.Lead", "property-path": "$[0].lead.displayName" }
+    ]
+  }
+}

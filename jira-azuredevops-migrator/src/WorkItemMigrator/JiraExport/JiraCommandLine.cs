@@ -154,6 +154,15 @@ namespace JiraExport
                     File.WriteAllText(sprintMetaPath, JsonConvert.SerializeObject(sprintMeta, Formatting.Indented));
                     Logger.Log(LogLevel.Info, $"Wrote sprint metadata for {sprintMeta.Count} sprint(s) to '{sprintMetaPath}'.");
                 }
+
+                // Write release/version metadata (dates/status/description) so the importer can produce a release report
+                var releaseMeta = JiraItem.GetReleaseMetadata();
+                if (releaseMeta.Count > 0)
+                {
+                    var releaseMetaPath = Path.Combine(migrationWorkspace, "release-metadata.json");
+                    File.WriteAllText(releaseMetaPath, JsonConvert.SerializeObject(releaseMeta, Formatting.Indented));
+                    Logger.Log(LogLevel.Info, $"Wrote release metadata for {releaseMeta.Count} release(s) to '{releaseMetaPath}'.");
+                }
             }
             catch (CommandParsingException e)
             {

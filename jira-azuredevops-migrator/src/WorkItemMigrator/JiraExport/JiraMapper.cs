@@ -119,6 +119,12 @@ namespace JiraExport
                             case "MapLexoRank":
                                 value = IfChanged<string>(item.Source, isCustomField, FieldMapperUtils.MapLexoRank);
                                 break;
+                            case "MapFixVersions":
+                                value = IfChanged<string>(item.Source, isCustomField, FieldMapperUtils.MapFixVersions);
+                                break;
+                            case "MapAffectsVersions":
+                                value = IfChanged<string>(item.Source, isCustomField, FieldMapperUtils.MapAffectsVersions);
+                                break;
                             default:
                                 value = IfChanged<string>(item.Source, isCustomField);
                                 break;

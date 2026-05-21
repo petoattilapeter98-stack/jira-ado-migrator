@@ -17,6 +17,15 @@ namespace JiraExport
         public DateTime? EndDate { get; set; }
     }
 
+    public class ReleaseMetadata
+    {
+        public string Description { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? ReleaseDate { get; set; }
+        public bool Released { get; set; }
+        public bool Archived { get; set; }
+    }
+
     public class JiraItem
     {
         // Sprint metadata cache: sprint name → start/end/state (populated during export)
@@ -24,6 +33,12 @@ namespace JiraExport
             new ConcurrentDictionary<string, SprintMetadata>(StringComparer.OrdinalIgnoreCase);
 
         public static IReadOnlyDictionary<string, SprintMetadata> GetSprintMetadata() => _sprintMetadataCache;
+
+        // Release/version metadata cache: version name → dates/status/description (populated during export)
+        private static readonly ConcurrentDictionary<string, ReleaseMetadata> _releaseMetadataCache =
+            new ConcurrentDictionary<string, ReleaseMetadata>(StringComparer.OrdinalIgnoreCase);
+
+        public static IReadOnlyDictionary<string, ReleaseMetadata> GetReleaseMetadata() => _releaseMetadataCache;
 
         #region Static
 
@@ -542,6 +557,27 @@ namespace JiraExport
                                 State = token["state"]?.ToString(),
                                 StartDate = startDate,
                                 EndDate = endDate
+                            };
+                        }
+                    }
+
+                    // Cache release/version metadata (dates/status/description) for the importer's release report
+                    foreach (var token in prop.Value.Children<JObject>())
+                    {
+                        var versionName = token["name"]?.ToString();
+                        bool looksLikeVersion = token["released"] != null || token["releaseDate"] != null || token["archived"] != null;
+                        if (!string.IsNullOrEmpty(versionName) && looksLikeVersion)
+                        {
+                            DateTime? versionStartDate = null, releaseDate = null;
+                            if (DateTime.TryParse(token["startDate"]?.ToString(), out var vsd)) versionStartDate = vsd;
+                            if (DateTime.TryParse(token["releaseDate"]?.ToString(), out var vrd)) releaseDate = vrd;
+                            _releaseMetadataCache[versionName] = new ReleaseMetadata
+                            {
+                                Description = token["description"]?.ToString(),
+                                StartDate = versionStartDate,
+                                ReleaseDate = releaseDate,
+                                Released = token["released"]?.ToObject<bool>() ?? false,
+                                Archived = token["archived"]?.ToObject<bool>() ?? false
                             };
                         }
                     }

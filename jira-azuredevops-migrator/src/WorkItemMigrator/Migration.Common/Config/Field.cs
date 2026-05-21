@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Migration.Common.Config
 {
@@ -27,5 +28,27 @@ namespace Migration.Common.Config
 
         [JsonProperty("mapping")]
         public Mapping Mapping { get; set; }
+
+        // --- PRO feature-parity additions (all optional) ---
+
+        // US7 composite mapper: source fields to consolidate into this single target.
+        [JsonProperty("composite-sources")]
+        public List<CompositeSource> CompositeSources { get; set; }
+
+        // Optional string.Format-style layout for composite values; when absent, sources are joined with CompositeSeparator.
+        [JsonProperty("composite-template")]
+        public string CompositeTemplate { get; set; }
+
+        // Separator used to join composite sources when no template is given; empty sources are skipped.
+        [JsonProperty("composite-separator")]
+        public string CompositeSeparator { get; set; } = " ";
+
+        // US8 object/array property selection: JSONPath into the source field's value (e.g. "$[0].name").
+        [JsonProperty("property-path")]
+        public string PropertyPath { get; set; }
+
+        // US1 per-field override of how versions land ("tags" | "field"); falls back to the global version-target.
+        [JsonProperty("version-target")]
+        public string VersionTarget { get; set; }
     }
 }

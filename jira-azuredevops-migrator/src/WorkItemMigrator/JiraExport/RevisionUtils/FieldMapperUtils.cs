@@ -169,6 +169,33 @@ namespace JiraExport
                 return string.Join(";", values);
         }
 
+        // US1: map Jira Fix Version assignments to prefixed, semicolon-separated ADO tags (e.g. "fix:2.3.0").
+        public static object MapFixVersions(string versions)
+        {
+            return MapVersionsAsTags(versions, "fix:");
+        }
+
+        // US1: map Jira Affects Version assignments to prefixed, semicolon-separated ADO tags (e.g. "affects:2.2.0").
+        public static object MapAffectsVersions(string versions)
+        {
+            return MapVersionsAsTags(versions, "affects:");
+        }
+
+        private static object MapVersionsAsTags(string versions, string prefix)
+        {
+            // Input arrives as the ";"-joined version names produced by JiraItem.ExtractFields.
+            if (string.IsNullOrWhiteSpace(versions))
+                return string.Empty;
+
+            var tags = versions
+                .Split(';')
+                .Select(v => v.Trim())
+                .Where(v => !string.IsNullOrEmpty(v))
+                .Select(v => prefix + v);
+
+            return string.Join(";", tags);
+        }
+
         public static object MapSprint(string iterationPathsString)
         {
             if (string.IsNullOrWhiteSpace(iterationPathsString))
