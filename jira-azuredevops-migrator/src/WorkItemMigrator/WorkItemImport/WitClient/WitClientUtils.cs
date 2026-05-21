@@ -721,6 +721,46 @@ namespace WorkItemImport
             }
         }
 
+        // US4: rewrite embedded Jira issue references in the work item's text fields so they point
+        // at migrated work items. Validates candidates against the in-scope inventory; resolves ids
+        // via the supplied resolver (journal). Unresolved references are left as plain text.
+        public bool CorrectEmbeddedIssueLinks(WorkItem wi, ISet<string> inScopeKeys, Func<string, int?> resolveWorkItemId, string workItemUrlFormat)
+        {
+            if (wi == null)
+                throw new ArgumentException(nameof(wi));
+
+            if (inScopeKeys == null || resolveWorkItemId == null || string.IsNullOrEmpty(workItemUrlFormat))
+                return false;
+
+            bool updated = false;
+            string[] textFields =
+            {
+                WiFieldReference.Description,
+                WiFieldReference.ReproSteps,
+                WiFieldReference.History,
+                WiFieldReference.AcceptanceCriteria
+            };
+
+            foreach (var fieldRef in textFields)
+            {
+                if (!wi.Fields.ContainsKey(fieldRef))
+                    continue;
+
+                var current = wi.Fields[fieldRef]?.ToString();
+                if (string.IsNullOrEmpty(current))
+                    continue;
+
+                var rewritten = EmbeddedLinkCorrector.Rewrite(current, inScopeKeys, resolveWorkItemId, workItemUrlFormat, out int rw, out _);
+                if (rw > 0 && rewritten != current)
+                {
+                    wi.Fields[fieldRef] = rewritten;
+                    updated = true;
+                }
+            }
+
+            return updated;
+        }
+
         private void CorrectImagePath(WorkItem wi, WiItem wiItem, WiRevision rev, ref string textField, ref bool isUpdated, IsAttachmentMigratedDelegate<string, string, bool> isAttachmentMigratedDelegate)
         {
             if (wi == null)

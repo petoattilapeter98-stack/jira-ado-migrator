@@ -122,8 +122,8 @@ Tests live in `…/tests/Migration.Jira-Export.Tests/`, `…/tests/Migration.Wi-
 
 - [X] T029 [US4] Build the pre-run inventory (issue keys + derived projects) from the exported items and write `inventory-index.json` in `…/JiraExport/JiraCommandLine.cs`, gated on `build-inventory`/`correct-embedded-links` (FR-020). NOTE: built from the exported set (post-mapping, pre-import) rather than a separate `JiraProvider` pass — simpler and captures the same in-scope keys
 - [X] T030 [US4] Added `Settings.Inventory` and load `inventory-index.json` in `…/WorkItemImport/ImportCommandLine.cs`
-- [X] T031 [US4] Rewriter logic implemented & tested as `…/WorkItemImport/EmbeddedLinkCorrector.cs` (browse URLs + bare keys validated against the inventory). DEFERRED: invoking it inside the live text-correction path (`WitClientUtils` description/comment/repro correction) — invasive signature threading, left as follow-up
-- [ ] T032 [US4] DEFERRED: finalization pass resolving not-yet-migrated (forward-reference) targets via the journal in `…/WorkItemImport/Agent.cs` — requires the live wiring (T031) first
+- [X] T031 [US4] Rewriter (`EmbeddedLinkCorrector`) now invoked live during import via new `WitClientUtils.CorrectEmbeddedIssueLinks` (rewrites Description/ReproSteps/History/AcceptanceCriteria), wired into `Agent.ImportRevision` before `SaveWorkItemFields`, gated on `correct-embedded-links` + inventory; resolves ids via `Journal.GetMigratedId` (+4 tests)
+- [ ] T032 [US4] DEFERRED: dedicated finalization pass for forward references (issues migrated *after* their referrer). Backward references already resolve in-loop (time-ordered import); only forward refs remain as plain text
 - [X] T033 [US4] Plain-text fallback + rewritten/unresolved counts implemented in `EmbeddedLinkCorrector.Rewrite` (FR-011); end-of-run aggregation lands with the live wiring
 
 **Checkpoint**: US1–US4 independently functional.

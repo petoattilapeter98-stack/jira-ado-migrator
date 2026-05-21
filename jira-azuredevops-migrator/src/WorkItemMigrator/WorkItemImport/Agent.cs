@@ -180,6 +180,17 @@ namespace WorkItemImport
                     }
                 }
 
+                // US4: rewrite embedded Jira issue links in text fields to point at migrated work items
+                if (settings.CorrectEmbeddedLinks && settings.Inventory != null && rev.DevelopmentLink == null)
+                {
+                    var workItemUrlFormat = $"{settings.Account?.TrimEnd('/')}/{settings.Project}/_workitems/edit/{{0}}";
+                    _witClientUtils.CorrectEmbeddedIssueLinks(
+                        wi,
+                        settings.Inventory.IssueKeys,
+                        originKey => { var id = _context.Journal.GetMigratedId(originKey); return id > 0 ? id : (int?)null; },
+                        workItemUrlFormat);
+                }
+
                 // rev with a development link won't have meaningful information, skip saving fields
                 if (rev.DevelopmentLink != null)
                 {
