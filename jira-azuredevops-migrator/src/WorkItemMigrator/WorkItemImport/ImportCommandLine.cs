@@ -112,6 +112,21 @@ namespace WorkItemImport
                     }
                 }
 
+                // Load release/version metadata written by jira-export and emit a release report (US1)
+                var releaseMetaPath = Path.Combine(config.Workspace, "release-metadata.json");
+                if (File.Exists(releaseMetaPath))
+                {
+                    var releaseDates = JsonConvert.DeserializeObject<Dictionary<string, ReleaseInfo>>(File.ReadAllText(releaseMetaPath));
+                    if (releaseDates != null)
+                    {
+                        settings.ReleaseDates = releaseDates;
+                        Logger.Log(LogLevel.Info, $"Loaded release metadata for {releaseDates.Count} release(s) from '{releaseMetaPath}'.");
+                        var releaseReport = ReleaseReport.Build(releaseDates);
+                        if (!string.IsNullOrWhiteSpace(releaseReport))
+                            Logger.Log(LogLevel.Info, releaseReport);
+                    }
+                }
+
                 // initialize Azure DevOps/TFS connection. Creates/fetches project, fills area and iteration caches.
                 var agent = Agent.Initialize(context, settings);
 

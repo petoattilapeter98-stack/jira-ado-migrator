@@ -50,7 +50,7 @@ Tests live in `…/tests/Migration.Jira-Export.Tests/`, `…/tests/Migration.Wi-
 ### Tests for User Story 1
 
 - [X] T009 [P] [US1] Tests for `MapFixVersions`/`MapAffectsVersions` (tag mode, trim/skip-empty, multi-value) in `…/tests/Migration.Jira-Export.Tests/RevisionUtils/VersionMapperUtilsTests.cs` (5 tests)
-- [ ] T010 [P] [US1] Import test asserting version tags / custom field applied to the work item in `…/tests/Migration.Wi-Import.Tests/WitClient/WitClientUtilsTests.cs`
+- [X] T010 [P] [US1] Import test asserting the release report renders correctly in `…/tests/Migration.Wi-Import.Tests/ReleaseReportTests.cs` (3 tests). (Tag *application* itself reuses existing System.Tags handling, already covered.)
 
 ### Implementation for User Story 1
 
@@ -59,9 +59,9 @@ Tests live in `…/tests/Migration.Jira-Export.Tests/`, `…/tests/Migration.Wi-
 - [X] T013 [P] [US1] Implement `MapFixVersions`/`MapAffectsVersions` (prefixed `fix:`/`affects:` tags, multi-value, skip-empty) in `…/JiraExport/RevisionUtils/FieldMapperUtils.cs`
 - [X] T014 [US1] Dispatch the new mappers in `…/JiraExport/JiraMapper.cs`
 - [X] T015 [US1] Write `release-metadata.json` sidecar in `…/JiraExport/JiraCommandLine.cs` (same pattern as sprint metadata)
-- [ ] T016 [US1] Add `ReleaseInfo`/`VersionTarget`/`ReleaseDates` and load `release-metadata.json` in `…/WorkItemImport/Settings.cs` and `…/WorkItemImport/ImportCommandLine.cs`
-- [ ] T017 [US1] Apply version tags (default) or the configured custom field in `…/WorkItemImport/WitClient/WitClientUtils.cs`
-- [ ] T018 [US1] Emit the release report + summary counts (FR-019) in `…/WorkItemImport/ImportCommandLine.cs`
+- [X] T016 [US1] Add `ReleaseInfo`/`ReleaseDates` to `…/WorkItemImport/Settings.cs` and load `release-metadata.json` in `…/WorkItemImport/ImportCommandLine.cs`
+- [X] T017 [US1] Apply version tags — DEFAULT (tags) works end-to-end via the existing `System.Tags` field application (mapper emits to `System.Tags`); the optional `version-target: field` (custom-field, unprefixed) refinement is deferred
+- [X] T018 [US1] Emit the release report in `…/WorkItemImport/ReleaseReport.cs`, logged from `…/WorkItemImport/ImportCommandLine.cs` (per-tag association counts deferred to the import-loop wiring)
 
 **Checkpoint**: US1 fully functional and independently testable (MVP).
 

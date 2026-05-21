@@ -26,6 +26,7 @@ namespace WorkItemImport
         public int ChangedDateBumpMS { get; set; }
         public string Workspace { get; internal set; }
         public Dictionary<string, SprintDateInfo> SprintDates { get; internal set; } = new Dictionary<string, SprintDateInfo>();
+        public Dictionary<string, ReleaseInfo> ReleaseDates { get; internal set; } = new Dictionary<string, ReleaseInfo>();
     }
 
     public class SprintDateInfo
@@ -33,5 +34,15 @@ namespace WorkItemImport
         public string State { get; set; }
         public System.DateTime? StartDate { get; set; }
         public System.DateTime? EndDate { get; set; }
+    }
+
+    // US1: release/version metadata loaded from release-metadata.json (parallels SprintDateInfo).
+    public class ReleaseInfo
+    {
+        public string Description { get; set; }
+        public System.DateTime? StartDate { get; set; }
+        public System.DateTime? ReleaseDate { get; set; }
+        public bool Released { get; set; }
+        public bool Archived { get; set; }
     }
 }
