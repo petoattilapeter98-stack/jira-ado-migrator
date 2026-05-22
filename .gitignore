@@ -11,6 +11,11 @@ logs/
 # Node (Spec Kit e2e extension)
 **/node_modules/
 
+# Local secrets / credentials — NEVER commit
+.secrets/
+*.local.env
+*.secret*
+
 # OS / editor cruft
 .DS_Store
 Thumbs.db
