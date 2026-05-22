@@ -614,5 +614,19 @@ namespace JiraExport
             var response = (JObject)_jiraServiceWrapper.RestClient.ExecuteRequestAsync(Method.GET, $"/rest/dev-status/latest/issue/detail?issueId={issueId}&applicationType=stash&dataType=repository").Result;
             return response.SelectTokens("$.detail[*].repositories[*]").Cast<JObject>();
         }
+
+        // US5: fetch an issue's remote/web links. The endpoint returns a JSON array of { object: { url, title } }.
+        public IEnumerable<JObject> GetRemoteLinks(string issueKey)
+        {
+            var response = _jiraServiceWrapper.RestClient.ExecuteRequestAsync(Method.GET, $"{JiraApi}/{Settings.JiraApiVersion}/issue/{issueKey}/remotelink").Result;
+            return response is JArray array ? array.Children<JObject>() : Enumerable.Empty<JObject>();
+        }
+
+        // US6: fetch an issue's development branches (dev-status API), mirroring GetCommitRepositories.
+        public IEnumerable<JObject> GetBranches(string issueId)
+        {
+            var response = (JObject)_jiraServiceWrapper.RestClient.ExecuteRequestAsync(Method.GET, $"/rest/dev-status/latest/issue/detail?issueId={issueId}&applicationType=stash&dataType=branch").Result;
+            return response.SelectTokens("$.detail[*].branches[*]").Cast<JObject>();
+        }
     }
 }

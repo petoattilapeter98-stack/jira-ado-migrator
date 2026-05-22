@@ -268,6 +268,36 @@ namespace WorkItemImport
 
         }
 
+        // US5: add a Jira remote/web link to the work item as an Azure DevOps "Hyperlink" relation.
+        public bool AddRemoteLink(WiLink link, WorkItem wi, Settings settings)
+        {
+            if (link == null || string.IsNullOrEmpty(link.Url) || wi?.Id == null)
+                return false;
+
+            // Skip if this hyperlink is already present.
+            if (wi.Relations != null && wi.Relations.Any(r =>
+                    r.Rel == "Hyperlink" && string.Equals(r.Url, link.Url, StringComparison.OrdinalIgnoreCase)))
+                return false;
+
+            var patchDocument = new JsonPatchDocument
+            {
+                JsonPatchDocUtils.CreateHyperlinkPatchOp(Operation.Add, link.Url, link.Title)
+            };
+
+            try
+            {
+                WorkItem updated = _witClientWrapper.UpdateWorkItem(patchDocument, wi.Id.Value, settings.SuppressNotifications);
+                if (updated?.Relations != null)
+                    wi.Relations = updated.Relations;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex, $"Failed to add remote link '{link.Url}' to work item {wi.Id}.", LogLevel.Warning);
+                return false;
+            }
+        }
+
         public void EnsureFieldsOnStateChange(WiRevision rev, WorkItem wi)
         {
             if (rev == null)

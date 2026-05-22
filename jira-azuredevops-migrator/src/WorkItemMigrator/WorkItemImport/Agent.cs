@@ -705,6 +705,15 @@ namespace WorkItemImport
             for (int i = 0; i < rev.Links.Count; i++)
             {
                 var link = rev.Links[i];
+
+                // US5: remote/web links have no target work item — apply them as hyperlinks and skip journal resolution
+                if (link.IsRemoteLink)
+                {
+                    if (!_witClientUtils.AddRemoteLink(link, wi, settings))
+                        success = false;
+                    continue;
+                }
+
                 try
                 {
                     int sourceWiId = _context.Journal.GetMigratedId(link.SourceOriginId);

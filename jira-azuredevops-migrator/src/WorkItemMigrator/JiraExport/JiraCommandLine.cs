@@ -94,6 +94,7 @@ namespace JiraExport
                     JQL = config.Query,
                     UsingJiraCloud = config.UsingJiraCloud,
                     IncludeDevelopmentLinks = config.IncludeDevelopmentLinks,
+                    IncludeBranchLinks = config.IncludeBranchLinks,
                     RepositoryMap = config.RepositoryMap,
                     JiraApiVersion = config.JiraApiVersion
                 };

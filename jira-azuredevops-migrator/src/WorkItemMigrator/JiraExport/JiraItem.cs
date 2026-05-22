@@ -186,6 +186,44 @@ namespace JiraExport
                             listOfRevisions.Add(commitRevision);
                         }
                     }
+
+                    // Get development links: branches (US6). Requires include-development-links + include-branch-links + a repository-map.
+                    if (settings.IncludeBranchLinks)
+                    {
+                        foreach (var branch in jiraProvider.GetBranches(jiraItem.Id))
+                        {
+                            var branchRepositoryName = branch.SelectToken("$.repository.name")?.Value<string>();
+                            if (string.IsNullOrEmpty(branchRepositoryName))
+                                continue;
+
+                            var hasBranchRepositoryTarget = settings.RepositoryMap.Repositories.Exists(
+                                r => r.Source == branchRepositoryName && !string.IsNullOrEmpty(r.Target));
+                            if (!hasBranchRepositoryTarget)
+                            {
+                                Logger.Log(LogLevel.Warning, $"Key {branchRepositoryName} did not exist in the repository-map. Branch artifacts for this repo will be skipped.");
+                                continue;
+                            }
+
+                            var branchName = branch.SelectToken("$.name")?.Value<string>();
+                            if (string.IsNullOrEmpty(branchName))
+                                continue;
+
+                            var branchCreatedOn = branch.ExValue<DateTime>("$.lastCommit.authorTimestamp");
+                            var branchAuthor = GetAuthor(branch.SelectToken("$.lastCommit") as JObject);
+
+                            listOfRevisions.Add(new JiraRevision(jiraItem)
+                            {
+                                Time = branchCreatedOn,
+                                Author = branchAuthor,
+                                Fields = new Dictionary<string, object>(),
+                                DevelopmentLink = new RevisionAction<JiraDevelopmentLink>()
+                                {
+                                    ChangeType = RevisionChangeType.Added,
+                                    Value = new JiraDevelopmentLink(branchRepositoryName, branchName, branchCreatedOn, JiraDevelopmentLink.DevelopmentLinkType.Branch)
+                                }
+                            });
+                        }
+                    }
                 }
             }
 

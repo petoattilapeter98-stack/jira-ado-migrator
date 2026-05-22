@@ -290,6 +290,20 @@ namespace JiraExport
             // map epic child
             LinkMapperUtils.MapEpicChildLink(r, links, "epic child", "Child", _config);
 
+            // US5: append remote/web links as hyperlinks (issue-level, emitted once on the creation revision)
+            if (r.Index == 0 && _config.IncludeRemoteLinks)
+            {
+                foreach (var remote in JiraRemoteLink.ExtractRemoteLinks(_jiraProvider.GetRemoteLinks(r.ParentItem.Key)))
+                {
+                    links.Add(new WiLink
+                    {
+                        Change = ReferenceChangeType.Added,
+                        IsRemoteLink = true,
+                        Url = remote.Url,
+                        Title = remote.Title
+                    });
+                }
+            }
 
             return links;
         }

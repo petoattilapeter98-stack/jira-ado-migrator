@@ -142,11 +142,11 @@ Tests live in `…/tests/Migration.Jira-Export.Tests/`, `…/tests/Migration.Wi-
 
 ### Implementation for User Story 5
 
-- [ ] T035 [US5] DEFERRED: fetch remote links (`/issue/{key}/remotelink`) in `…/JiraExport/JiraServiceWrapper.cs`/`JiraProvider.cs` — Jira REST call, not verifiable offline; needs a live instance
-- [ ] T036 [P] [US5] DEFERRED: `JiraRemoteLink` model + `ExtractRemoteLinks` in `…/JiraExport/JiraItem.cs` (depends on T035)
-- [ ] T037 [P] [US5] DEFERRED: extend `WiLink` with `IsRemoteLink`/`Url`/`Title` (inert until export/apply exist)
+- [X] T035 [US5] Added `GetRemoteLinks(issueKey)` in `…/JiraExport/JiraProvider.cs` (+ `IJiraProvider`), mirroring `GetCommitRepositories`. NOTE: the raw HTTP call is verified only against live Jira (consistent with the rest of the REST layer)
+- [X] T036 [P] [US5] Added `JiraRemoteLink` model + `ExtractRemoteLinks` in `…/JiraExport/JiraRemoteLink.cs`; emitted as hyperlink `WiLink`s in `JiraMapper.MapLinks` (gated by `include-remote-links`, creation revision). 3 unit tests in `JiraRemoteLinkTests.cs`
+- [X] T037 [P] [US5] Extended `WiLink` with `IsRemoteLink`/`Url`/`Title` in `…/Migration.WIContract/WiLink.cs`
 - [X] T038 [US5] Added `CreateHyperlinkPatchOp` in `…/WorkItemImport/WitClient/JsonPatchDocUtils.cs` — import is now hyperlink-capable
-- [ ] T039 [US5] DEFERRED: apply hyperlinks in `…/WorkItemImport/Agent.cs` (`ApplyAndSaveLinks`) (depends on T035/T036)
+- [X] T039 [US5] Apply hyperlinks: `Agent.ApplyAndSaveLinks` branches on `IsRemoteLink` → new `WitClientUtils.AddRemoteLink` (builds the `CreateHyperlinkPatchOp`, de-dupes, calls `UpdateWorkItem`)
 
 **Checkpoint**: US1–US5 independently functional.
 
@@ -165,7 +165,7 @@ Tests live in `…/tests/Migration.Jira-Export.Tests/`, `…/tests/Migration.Wi-
 ### Implementation for User Story 6
 
 - [X] T041 [US6] `Branch` already present in `DevelopmentLinkType` (`…/JiraExport/JiraDevelopmentLink.cs`) — verified
-- [ ] T042 [US6] DEFERRED: fetch branches (parallel to commit fetch) in `…/JiraExport/JiraItem.cs` — Jira dev-status REST call, not verifiable offline
+- [X] T042 [US6] Added `GetBranches(issueId)` (dev-status `dataType=branch`) in `…/JiraExport/JiraProvider.cs` + branch revision-building in `JiraItem` (gated by `include-branch-links` + repository-map; reuses the existing `Branch` enum + import artifact-link patch). NOTE: raw HTTP verified only against live Jira
 - [X] T043 [US6] Added the `Branch` case (Git ref artifact URI) in `…/WorkItemImport/WitClient/JsonPatchDocUtils.cs` — import is now branch-capable
 
 **Checkpoint**: US1–US6 independently functional.

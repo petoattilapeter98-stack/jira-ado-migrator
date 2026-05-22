@@ -33,5 +33,9 @@ namespace JiraExport
         Task<List<RevisionAction<JiraAttachment>>> DownloadAttachments(JiraRevision rev);
 
         IEnumerable<JObject> GetCommitRepositories(string issueId);
+
+        IEnumerable<JObject> GetRemoteLinks(string issueKey);
+
+        IEnumerable<JObject> GetBranches(string issueId);
     }
 }
