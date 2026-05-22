@@ -28,6 +28,8 @@ namespace WorkItemImport
         public int RootArea { get; private set; }
         private readonly Dictionary<string, string> _iterationPathMap = new Dictionary<string, string>();
         private readonly Dictionary<string, string> _areaPathMap = new Dictionary<string, string>();
+        // US4 (T032): work items whose embedded references couldn't yet resolve (forward references); re-corrected after import.
+        private readonly HashSet<int> _itemsWithUnresolvedEmbeddedLinks = new HashSet<int>();
 
         private WitClientUtils _witClientUtils;
         private WebApi.WorkItemTrackingHttpClient _wiClient;
@@ -188,7 +190,12 @@ namespace WorkItemImport
                         wi,
                         settings.Inventory.IssueKeys,
                         originKey => { var id = _context.Journal.GetMigratedId(originKey); return id > 0 ? id : (int?)null; },
-                        workItemUrlFormat);
+                        workItemUrlFormat,
+                        out int unresolvedEmbeddedLinks);
+
+                    // Forward reference (target migrated later): remember to re-correct after the full import (T032)
+                    if (unresolvedEmbeddedLinks > 0 && wi.Id.HasValue)
+                        _itemsWithUnresolvedEmbeddedLinks.Add(wi.Id.Value);
                 }
 
                 // rev with a development link won't have meaningful information, skip saving fields
@@ -686,6 +693,40 @@ namespace WorkItemImport
             }
 
             return success;
+        }
+
+        // US4 (T032): re-run embedded-link correction on items that had unresolved forward references,
+        // now that the journal holds every origin → work-item mapping. Call once after the main import loop.
+        public void FinalizeEmbeddedLinks(Settings settings)
+        {
+            if (settings == null || !settings.CorrectEmbeddedLinks || settings.Inventory == null
+                || _itemsWithUnresolvedEmbeddedLinks.Count == 0)
+                return;
+
+            var workItemUrlFormat = $"{settings.Account?.TrimEnd('/')}/{settings.Project}/_workitems/edit/{{0}}";
+            int resolvedItems = 0;
+
+            foreach (var wiId in _itemsWithUnresolvedEmbeddedLinks)
+            {
+                try
+                {
+                    if (_witClientUtils.FinalizeEmbeddedIssueLinks(
+                            wiId,
+                            settings.Inventory.IssueKeys,
+                            originKey => { var id = _context.Journal.GetMigratedId(originKey); return id > 0 ? id : (int?)null; },
+                            workItemUrlFormat,
+                            settings))
+                    {
+                        resolvedItems++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex, $"Failed to finalize embedded links for work item {wiId}.", LogLevel.Warning);
+                }
+            }
+
+            Logger.Log(LogLevel.Info, $"Embedded-link finalization: resolved forward references on {resolvedItems} of {_itemsWithUnresolvedEmbeddedLinks.Count} candidate work item(s).");
         }
 
         private bool ApplyAndSaveLinks(WiRevision rev, WorkItem wi, Settings settings)

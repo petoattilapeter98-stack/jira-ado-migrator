@@ -754,8 +754,10 @@ namespace WorkItemImport
         // US4: rewrite embedded Jira issue references in the work item's text fields so they point
         // at migrated work items. Validates candidates against the in-scope inventory; resolves ids
         // via the supplied resolver (journal). Unresolved references are left as plain text.
-        public bool CorrectEmbeddedIssueLinks(WorkItem wi, ISet<string> inScopeKeys, Func<string, int?> resolveWorkItemId, string workItemUrlFormat)
+        public bool CorrectEmbeddedIssueLinks(WorkItem wi, ISet<string> inScopeKeys, Func<string, int?> resolveWorkItemId, string workItemUrlFormat, out int unresolved)
         {
+            unresolved = 0;
+
             if (wi == null)
                 throw new ArgumentException(nameof(wi));
 
@@ -780,7 +782,8 @@ namespace WorkItemImport
                 if (string.IsNullOrEmpty(current))
                     continue;
 
-                var rewritten = EmbeddedLinkCorrector.Rewrite(current, inScopeKeys, resolveWorkItemId, workItemUrlFormat, out int rw, out _);
+                var rewritten = EmbeddedLinkCorrector.Rewrite(current, inScopeKeys, resolveWorkItemId, workItemUrlFormat, out int rw, out int un);
+                unresolved += un;
                 if (rw > 0 && rewritten != current)
                 {
                     wi.Fields[fieldRef] = rewritten;
@@ -789,6 +792,55 @@ namespace WorkItemImport
             }
 
             return updated;
+        }
+
+        // US4 (T032): forward-reference finalization. After the full import (journal complete), re-fetch a
+        // work item that earlier had unresolved references and persist only the text fields that now resolve.
+        public bool FinalizeEmbeddedIssueLinks(int wiId, ISet<string> inScopeKeys, Func<string, int?> resolveWorkItemId, string workItemUrlFormat, Settings settings)
+        {
+            if (inScopeKeys == null || resolveWorkItemId == null || string.IsNullOrEmpty(workItemUrlFormat))
+                return false;
+
+            WorkItem wi = GetWorkItem(wiId);
+            if (wi?.Fields == null)
+                return false;
+
+            var patchDocument = new JsonPatchDocument();
+            string[] textFields =
+            {
+                WiFieldReference.Description,
+                WiFieldReference.ReproSteps,
+                WiFieldReference.History,
+                WiFieldReference.AcceptanceCriteria
+            };
+
+            foreach (var fieldRef in textFields)
+            {
+                if (!wi.Fields.ContainsKey(fieldRef))
+                    continue;
+
+                var current = wi.Fields[fieldRef]?.ToString();
+                if (string.IsNullOrEmpty(current))
+                    continue;
+
+                var rewritten = EmbeddedLinkCorrector.Rewrite(current, inScopeKeys, resolveWorkItemId, workItemUrlFormat, out int rw, out _);
+                if (rw > 0 && rewritten != current)
+                    patchDocument.Add(JsonPatchDocUtils.CreateJsonFieldPatchOp(Operation.Replace, fieldRef, rewritten));
+            }
+
+            if (patchDocument.Count == 0)
+                return false;
+
+            try
+            {
+                _witClientWrapper.UpdateWorkItem(patchDocument, wiId, settings.SuppressNotifications);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex, $"Failed to finalize embedded links for work item {wiId}.", LogLevel.Warning);
+                return false;
+            }
         }
 
         private void CorrectImagePath(WorkItem wi, WiItem wiItem, WiRevision rev, ref string textField, ref bool isUpdated, IsAttachmentMigratedDelegate<string, string, bool> isAttachmentMigratedDelegate)

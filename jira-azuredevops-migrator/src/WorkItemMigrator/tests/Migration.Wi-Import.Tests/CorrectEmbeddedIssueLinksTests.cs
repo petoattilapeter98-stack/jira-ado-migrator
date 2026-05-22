@@ -26,7 +26,7 @@ namespace Migration.Wi_Import.Tests
             var wi = WiWith(WiFieldReference.Description, "see ABC-1 please");
             var keys = new HashSet<string> { "ABC-1" };
 
-            bool updated = NewUtils().CorrectEmbeddedIssueLinks(wi, keys, k => k == "ABC-1" ? 42 : (int?)null, UrlFormat);
+            bool updated = NewUtils().CorrectEmbeddedIssueLinks(wi, keys, k => k == "ABC-1" ? 42 : (int?)null, UrlFormat, out _);
 
             Assert.That(updated, Is.True);
             Assert.That(wi.Fields[WiFieldReference.Description].ToString(), Does.Contain("edit/42"));
@@ -38,7 +38,7 @@ namespace Migration.Wi_Import.Tests
             var wi = WiWith(WiFieldReference.History, "blocked by ABC-2");
             var keys = new HashSet<string> { "ABC-2" };
 
-            bool updated = NewUtils().CorrectEmbeddedIssueLinks(wi, keys, _ => 7, UrlFormat);
+            bool updated = NewUtils().CorrectEmbeddedIssueLinks(wi, keys, _ => 7, UrlFormat, out _);
 
             Assert.That(updated, Is.True);
             Assert.That(wi.Fields[WiFieldReference.History].ToString(), Does.Contain("edit/7"));
@@ -50,7 +50,7 @@ namespace Migration.Wi_Import.Tests
             var wi = WiWith(WiFieldReference.Description, "see XYZ-9 please");
             var keys = new HashSet<string> { "ABC-1" };
 
-            bool updated = NewUtils().CorrectEmbeddedIssueLinks(wi, keys, _ => null, UrlFormat);
+            bool updated = NewUtils().CorrectEmbeddedIssueLinks(wi, keys, _ => null, UrlFormat, out _);
 
             Assert.That(updated, Is.False);
             Assert.That(wi.Fields[WiFieldReference.Description].ToString(), Is.EqualTo("see XYZ-9 please"));
@@ -61,7 +61,7 @@ namespace Migration.Wi_Import.Tests
         {
             var wi = WiWith(WiFieldReference.Description, "see ABC-1");
 
-            bool updated = NewUtils().CorrectEmbeddedIssueLinks(wi, null, _ => 1, UrlFormat);
+            bool updated = NewUtils().CorrectEmbeddedIssueLinks(wi, null, _ => 1, UrlFormat, out _);
 
             Assert.That(updated, Is.False);
         }

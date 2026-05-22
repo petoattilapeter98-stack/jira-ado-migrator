@@ -246,6 +246,9 @@ namespace WorkItemImport
                         }
                     }
                 }
+
+                // US4 (T032): resolve forward references (links to items migrated later) now that the journal is complete
+                agent.FinalizeEmbeddedLinks(settings);
             }
             catch (CommandParsingException e)
             {
