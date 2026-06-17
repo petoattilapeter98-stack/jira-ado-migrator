@@ -1,0 +1,81 @@
+{
+  "source-project": "SCRUM",
+  "target-project": "Scrum-Demo-From-Jira",
+  "query": "project = SCRUM ORDER BY Rank ASC",
+  "using-jira-cloud": true,
+  "jira-api-version": 3,
+  "workspace": "C:\\Temp\\JiraExport\\",
+  "epic-link-field": "Epic Link",
+  "sprint-field": "Sprint",
+  "download-options": 7,
+  "batch-size": 20,
+  "log-level": "Info",
+  "attachment-folder": "Attachments",
+  "user-mapping-file": "users.txt",
+  "base-area-path": "Migrated",
+  "base-iteration-path": "Migrated",
+  "ignore-failed-links": true,
+  "process-template": "Scrum",
+
+  "//": "--- PRO feature-parity opt-in keys (see docs/pro-feature-parity.md) ---",
+  "build-inventory": true,
+  "correct-embedded-links": true,
+  "include-remote-links": true,
+  "include-branch-links": true,
+  "version-target": "tags",
+  "state-date-map": [
+    { "state": "Active", "date-field": "Microsoft.VSTS.Common.ActivatedDate" },
+    { "state": "Resolved", "date-field": "Microsoft.VSTS.Common.ResolvedDate" },
+    { "state": "Closed", "date-field": "Microsoft.VSTS.Common.ClosedDate" }
+  ],
+
+  "link-map": {
+    "link": [
+      { "source": "Epic", "target": "System.LinkTypes.Hierarchy-Reverse" },
+      { "source": "Parent", "target": "System.LinkTypes.Hierarchy-Reverse" },
+      { "source": "Relates", "target": "System.LinkTypes.Related" },
+      { "source": "Duplicate", "target": "System.LinkTypes.Duplicate-Forward" }
+    ]
+  },
+  "type-map": {
+    "type": [
+      { "source": "Epic", "target": "Epic" },
+      { "source": "Story", "target": "Product Backlog Item" },
+      { "source": "Bug", "target": "Bug" },
+      { "source": "Task", "target": "Task" },
+      { "source": "Sub-task", "target": "Task" }
+    ]
+  },
+  "field-map": {
+    "field": [
+      { "source": "summary", "target": "System.Title", "mapper": "MapTitle" },
+      { "source": "assignee", "target": "System.AssignedTo", "mapper": "MapUser" },
+      { "source": "description", "target": "System.Description", "mapper": "MapRendered" },
+      { "source": "comment", "target": "System.History", "mapper": "MapRendered" },
+      { "source": "labels", "target": "System.Tags", "mapper": "MapTags" },
+
+      { "source": "fixVersions", "target": "System.Tags", "mapper": "MapFixVersions" },
+      { "source": "versions", "target": "System.Tags", "mapper": "MapAffectsVersions" },
+
+      {
+        "target": "Custom.OriginContext",
+        "source": "composite",
+        "mapper": "MapComposite",
+        "composite-separator": " / ",
+        "composite-sources": [
+          { "source": "components", "source-type": "name" },
+          { "source": "environment", "source-type": "name" }
+        ]
+      },
+
+      { "source": "customfield_10100", "target": "Custom.ComponentLead", "property-path": "$[0].lead.displayName" },
+
+      {
+        "source": "Sprint",
+        "source-type": "name",
+        "target": "System.IterationPath",
+        "mapper": "MapSprint"
+      }
+    ]
+  }
+}
