@@ -89,6 +89,12 @@ dotnet build   WorkItemMigrator.sln -c Release
 
 The two CLI executables land under each project's `bin/Release/net10.0/`.
 
+> The projects are SDK-style with `PackageReference`, so `dotnet build` restores and builds in one
+> step — no `nuget restore`/`msbuild` needed. The stray `packages.config` files are stale upstream
+> leftovers and are ignored. A clean build produces **0 errors** but ~135 warnings: obsolete-API
+> notices (`SYSLIB0014`, `CS7035`) and `MSB3243/MSB3245` assembly-version conflicts left over from
+> the net6 → net10 move. These are expected; don't treat them as regressions.
+
 ---
 
 ## 4. Testing
