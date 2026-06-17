@@ -16,6 +16,9 @@ logs/
 *.local.env
 *.secret*
 
+# POC migration workspace (exported Jira data, journal, attachments, logs) — scratch
+migration-poc/
+
 # OS / editor cruft
 .DS_Store
 Thumbs.db
