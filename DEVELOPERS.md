@@ -42,23 +42,19 @@ items, links, and attachments — applying the field mappings and PRO-parity pas
 
 ## 2. Repository layout
 
+The repo root holds project-level meta (docs, specs, scripts), and **all tool code lives in the
+single `jira-azuredevops-migrator/` tree** — the vendored upstream Community edition with the
+PRO-parity additions merged in.
+
 ```text
 jira-ado-migrator/                  # repo root
 ├── README.md                       # Project overview & provenance
 ├── FEATURES.md                     # The 8 PRO-parity capabilities (what + key config)
 ├── DEVELOPERS.md                   # ← this file
 ├── CLAUDE.md                       # Agent/dev guidelines (tech stack, conventions)
-├── azure-pipelines.yml             # CI pipeline — builds from root src/ (see §3)
-├── .github/                        # GitHub workflows and issue templates
+├── .github/                        # GitHub workflows and issue templates (repo-level CI)
 ├── .gitignore                      # Visual Studio .gitignore
 ├── .specify/                       # Spec Kit config, templates, extensions
-├── docs/                           # Primary docs (referenced by CI for Samples artifact)
-│   ├── overview.md                 # Migration process overview
-│   ├── config.md                   # Full config key reference
-│   ├── jira-export.md              # Stage 1 CLI reference
-│   ├── wi-import.md                # Stage 2 CLI reference
-│   ├── Samples/                    # config-agile.json, config-basic.json, config-cmmi.json, config-scrum.json
-│   └── ...                         # journalfile, logfile, faq, etc.
 ├── scripts/
 │   └── provision-ado-users.sh      # Bulk ADO user provisioning from users.txt
 ├── specs/
@@ -72,63 +68,48 @@ jira-ado-migrator/                  # repo root
 │       ├── checklists/
 │       └── contracts/
 │
-├── src/                            # Community edition baseline — PRIMARY CI BUILD TARGET
-│   ├── WorkItemMigrator/           # ← build: WorkItemMigrator.sln
-│   │   ├── JiraExport/             # Stage 1 CLI
-│   │   ├── WorkItemImport/         # Stage 2 CLI
-│   │   ├── Migration.Common/       # Shared core: config, mapping, journal
-│   │   ├── Migration.Common.Log/   # Logging abstraction
-│   │   ├── Migration.WIContract/   # Shared on-disk work-item contract
-│   │   ├── WorkItemMigrator.sln
-│   │   └── tests/                  # NUnit unit tests (4 test projects)
-│   └── WorkItemMigrator.Extension/ # Azure DevOps marketplace extension (packaged by CI)
-│
-├── test/
-│   └── integration/                # Integration test harness
-│       ├── smoke-tests.py          # End-to-end smoke test script
-│       ├── delete-work-items.py    # Cleanup helper
-│       ├── config-cloud.json       # Integration config for Jira Cloud
-│       ├── config-server.json      # Integration config for Jira Server
-│       ├── integration-test-cloud.yml
-│       ├── integration-test-server.yml
-│       └── users.txt               # User mapping for integration runs
-│
-└── jira-azuredevops-migrator/      # Vendored upstream with PRO-parity additions merged in
-    ├── readme.md                   # Upstream readme
-    ├── LICENSE.md
-    ├── azure-pipelines.yml         # Upstream CI (builds from its own src/)
+└── jira-azuredevops-migrator/      # The .NET tool — vendored Community edition + PRO additions
+    ├── readme.md                   # Tool readme
+    ├── LICENSE.md                  # Upstream license (respect for vendored code)
+    ├── azure-pipelines.yml         # CI pipeline — builds src/WorkItemMigrator/WorkItemMigrator.sln
     ├── config.json                 # Working migration config sample
-    ├── docs/                       # Upstream docs + pro-feature-parity.md
-    │   └── pro-feature-parity.md  # PRO-parity feature reference
+    ├── docs/                       # Tool docs
+    │   ├── overview.md             # Migration process overview
+    │   ├── config.md               # Full config key reference
+    │   ├── jira-export.md          # Stage 1 CLI reference
+    │   ├── wi-import.md            # Stage 2 CLI reference
+    │   ├── pro-feature-parity.md   # PRO-parity feature reference
+    │   ├── Samples/                # config-agile.json, config-basic.json, config-cmmi.json, config-scrum.json
+    │   └── ...                     # journalfile, logfile, faq, etc.
     ├── src/
-    │   ├── WorkItemMigrator/       # Extended solution (PRO additions live here)
-    │   │   ├── JiraExport/         # + JiraRemoteLink.cs, JiraDevelopmentLink.cs
-    │   │   ├── WorkItemImport/     # + EmbeddedLinkCorrector.cs, IterationDates.cs,
-    │   │   │                       #   ReleaseReport.cs, StateTransitionDates.cs
-    │   │   ├── Migration.Common/   # + CapabilitySummary.cs, InventoryIndex.cs,
-    │   │   │                       #   Config/CompositeSource.cs, Config/StateDate.cs
-    │   │   ├── Migration.Common.Log/
-    │   │   ├── Migration.WIContract/
+    │   ├── WorkItemMigrator/       # ← build this: WorkItemMigrator.sln
+    │   │   ├── JiraExport/         # Stage 1 CLI (+ JiraRemoteLink.cs, JiraDevelopmentLink.cs)
+    │   │   ├── WorkItemImport/     # Stage 2 CLI (+ EmbeddedLinkCorrector.cs, IterationDates.cs,
+    │   │   │                       #   ReleaseReport.cs, StateTransitionDates.cs)
+    │   │   ├── Migration.Common/   # Shared core: config, mapping, journal
+    │   │   │                       #   (+ CapabilitySummary.cs, InventoryIndex.cs,
+    │   │   │                       #    Config/CompositeSource.cs, Config/StateDate.cs)
+    │   │   ├── Migration.Common.Log/  # Logging abstraction
+    │   │   ├── Migration.WIContract/  # Shared on-disk work-item contract
     │   │   ├── WorkItemMigrator.sln
-    │   │   └── tests/              # Extended test suite (includes PRO-parity tests)
-    │   └── WorkItemMigrator.Extension/
+    │   │   └── tests/              # NUnit test projects (incl. PRO-parity tests)
+    │   └── WorkItemMigrator.Extension/ # Azure DevOps marketplace extension (packaged by CI)
     └── test/
-        └── integration/            # Mirror of root test/integration/
+        └── integration/            # Integration test harness
+            ├── smoke-tests.py      # End-to-end smoke test script
+            ├── delete-work-items.py  # Cleanup helper
+            ├── config-cloud.json   # Integration config for Jira Cloud
+            ├── config-server.json  # Integration config for Jira Server
+            ├── integration-test-cloud.yml
+            ├── integration-test-server.yml
+            └── users.txt           # User mapping for integration runs
 ```
 
-### Two source trees
+> **History note:** earlier revisions carried a second, parallel copy of the solution at the repo
+> root (`src/`, `test/`, `docs/`) that mirrored the Community baseline. That duplicate has been
+> removed — `jira-azuredevops-migrator/` is now the single source of truth.
 
-The repo contains two parallel .NET solutions:
-
-| Tree | Purpose | What's unique |
-|---|---|---|
-| `src/WorkItemMigrator/` | Community baseline — what CI builds and ships | Clean community edition |
-| `jira-azuredevops-migrator/src/WorkItemMigrator/` | Vendored upstream with PRO additions | PRO-parity feature code and tests |
-
-When implementing a PRO-parity feature, work is done in `jira-azuredevops-migrator/src/` and then
-ported into root `src/` for CI and release.
-
-### Solution projects (`src/WorkItemMigrator/WorkItemMigrator.sln`)
+### Solution projects (`jira-azuredevops-migrator/src/WorkItemMigrator/WorkItemMigrator.sln`)
 
 | Project | Output | Responsibility |
 |---|---|---|
@@ -149,20 +130,12 @@ ported into root `src/` for CI and release.
   surrounding style rather than modernizing opportunistically.
 
 ```bash
-cd src/WorkItemMigrator
+cd jira-azuredevops-migrator/src/WorkItemMigrator
 dotnet restore WorkItemMigrator.sln
 dotnet build   WorkItemMigrator.sln -c Release
 ```
 
 The two CLI executables land under each project's `bin/Release/net10.0/`.
-
-To build and test the vendored PRO-parity tree instead:
-
-```bash
-cd jira-azuredevops-migrator/src/WorkItemMigrator
-dotnet restore WorkItemMigrator.sln
-dotnet build   WorkItemMigrator.sln -c Release
-```
 
 > The projects are SDK-style with `PackageReference`, so `dotnet build` restores and builds in one
 > step. The stray `packages.config` files are stale upstream leftovers. A clean build produces
@@ -176,19 +149,16 @@ dotnet build   WorkItemMigrator.sln -c Release
 NUnit, one project per area. Run the whole suite from the solution folder:
 
 ```bash
-cd src/WorkItemMigrator
+cd jira-azuredevops-migrator/src/WorkItemMigrator
 dotnet test WorkItemMigrator.sln
 ```
 
 | Test project | Covers |
 |---|---|
-| `Migration.Jira-Export.Tests` | Jira mapping, revisions, links, export-side logic |
-| `Migration.Wi-Import.Tests` | Import agent, execution plan, WIT client utilities |
-| `Migration.Common.Tests` | Config, field/user mapping, migration context |
+| `Migration.Jira-Export.Tests` | Jira mapping, revisions, links, export-side logic (incl. remote links, composite/version mappers) |
+| `Migration.Wi-Import.Tests` | Import agent, execution plan, WIT client, embedded-link correction, iteration/state dates |
+| `Migration.Common.Tests` | Config, field/user mapping, migration context, inventory index |
 | `Migration.WIContract.Tests` | The shared on-disk contract |
-
-The `jira-azuredevops-migrator/src/WorkItemMigrator/tests/` tree has additional tests covering the
-PRO-parity additions (embedded-link correction, state-date maps, composite mapper, etc.).
 
 Run a single project, or filter by name:
 
@@ -197,8 +167,8 @@ dotnet test tests/Migration.Wi-Import.Tests/Migration.Wi-Import.Tests.csproj
 dotnet test WorkItemMigrator.sln --filter "FullyQualifiedName~EmbeddedLink"
 ```
 
-**Integration tests** live under `test/integration/`. They require real Jira and ADO credentials;
-see the config files `test/integration/config-cloud.json` and `config-server.json` for parameters.
+**Integration tests** live under `jira-azuredevops-migrator/test/integration/`. They require real
+Jira and ADO credentials; see `config-cloud.json` and `config-server.json` there for parameters.
 
 Every PRO-parity addition ships with tests — keep that invariant when extending.
 
@@ -207,7 +177,7 @@ Every PRO-parity addition ships with tests — keep that invariant when extendin
 ## 5. Running a migration end-to-end
 
 All behavior is driven by a **`config.json`** (see `jira-azuredevops-migrator/config.json` for a
-working sample, and `docs/config.md` for the full key reference).
+working sample, and `jira-azuredevops-migrator/docs/config.md` for the full key reference).
 
 ```bash
 # Stage 1 — export Jira issues to ./export (or wherever config points)
@@ -225,8 +195,9 @@ wi-import   --config config.json --token <ado-pat> --force
 **User provisioning:** before import, ADO accounts referenced by the user map must exist.
 `scripts/provision-ado-users.sh` bulk-provisions them from a `users.txt` mapping.
 
-> **Never commit credentials.** Jira tokens, ADO PATs, and `users.txt` copies with real data are
-> gitignored via `*.secret*`, `*.local.env` patterns in `.gitignore`.
+> **Never commit credentials.** Pass Jira tokens / ADO PATs on the command line from an environment
+> variable (e.g. `--token "$ADO_PAT"`), and keep any `users.txt` with real data out of commits.
+> Prefer a local, gitignored path for secrets rather than placing them in tracked files.
 
 ---
 
