@@ -180,17 +180,40 @@ All behavior is driven by a **`config.json`** (see `jira-azuredevops-migrator/co
 working sample, and `jira-azuredevops-migrator/docs/config.md` for the full key reference).
 
 ```bash
-# Stage 1 — export Jira issues to ./export (or wherever config points)
-jira-export --config config.json --user <jira-user> --password <api-token> --force
+# Stage 1 — export Jira issues to the workspace (path from config.json)
+jira-export \
+  --url https://<your-org>.atlassian.net \
+  -u <jira-email> \
+  -p <jira-api-token> \
+  --config config.json \
+  --force
 
 # inspect the exported <KEY>.json files, inventory-index.json, etc.
 
 # Stage 2 — import the exported files into Azure DevOps
-wi-import   --config config.json --token <ado-pat> --force
+wi-import \
+  --url https://dev.azure.com/<your-org> \
+  --token <ado-pat> \
+  --config config.json \
+  --force
 ```
 
-`--force` re-runs items the journal already marked done. Logs are written per run as
-`jira-export-log-*.txt` / `wi-import-log-*.txt`.
+Flag reference (run either tool with `-h` for the full list):
+
+| Flag | `jira-export` | `wi-import` | Notes |
+|---|---|---|---|
+| `--url` | ✅ | ✅ | Jira account URL / ADO org URL. Effectively required for a real run. |
+| `-u` / `-p` | ✅ | — | Jira username + password. For Jira **Cloud**, use your email as `-u` and an API token as `-p`. |
+| `-t` | optional | — | Bearer token for OAuth2 (alternative to `-u`/`-p`). |
+| `--token` | — | ✅ | ADO Personal Access Token. |
+| `--config` | ✅ | ✅ | Path to `config.json`. The only flag the parser strictly enforces. |
+| `--force` | optional | optional | Re-run from scratch, ignoring journal entries already marked done. |
+| `--continue` | optional | optional | Keep going after a critical error. |
+
+> Note: `-u`/`-p`/`-t`/`--token` are **short/exact** option names — there are no `--user` or
+> `--password` long forms, and unknown flags are rejected.
+
+Logs are written per run as `jira-export-log-*.txt` / `wi-import-log-*.txt`.
 
 **User provisioning:** before import, ADO accounts referenced by the user map must exist.
 `scripts/provision-ado-users.sh` bulk-provisions them from a `users.txt` mapping.
